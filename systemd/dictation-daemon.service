@@ -1,0 +1,19 @@
+[Unit]
+Description=Push-to-talk dictation daemon (faster-whisper, warm model)
+Documentation=https://github.com/MomoMizu94/Dictation-tool
+
+# Started by bin/dictation-session-start from Hyprland's startup hook, after
+# importing WAYLAND_DISPLAY. default.target starts too early at login, and this
+# bare Hyprland session does not activate graphical-session.target.
+
+[Service]
+Type=simple
+ExecStart=%h/Documents/GitHub/Dictation-tool/bin/dictation-daemon
+Restart=on-failure
+RestartSec=2
+
+# The model download and the first-run PTX JIT for sm_120 can take minutes.
+TimeoutStartSec=600
+
+# Keep the JIT cache warm across restarts; without it every cold start re-JITs.
+Environment=CUDA_CACHE_MAXSIZE=2147483648

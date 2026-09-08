@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Thin client. Symlink this into ~/.local/bin and point the Hyprland binds at it
+set -euo pipefail
+
+REPO="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/.." && pwd)"
+
+cd -- "$REPO"
+exec "$REPO/.venv/bin/python" -m dictation.client "$@"

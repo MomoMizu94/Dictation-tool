@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Run from Hyprland's startup hook
+set -euo pipefail
+
+: "${WAYLAND_DISPLAY:?Run this from the Wayland session}"
+: "${XDG_RUNTIME_DIR:?The session runtime directory is required}"
+
+# Import before restarting
+systemctl --user import-environment WAYLAND_DISPLAY XDG_RUNTIME_DIR
+systemctl --user restart dictation-daemon.service

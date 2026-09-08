@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Launch the daemon with the venv's vendored CUDA 12 libraries on the loader path
+set -euo pipefail
+
+REPO="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/.." && pwd)"
+PYTHON="$REPO/.venv/bin/python"
+
+if [[ ! -x "$PYTHON" ]]; then
+    echo "dictation-daemon: no venv at $REPO/.venv -- see README setup" >&2
+    exit 1
+fi
+
+# Collect every nvidia/*/lib directory the venv has vendored
+NVIDIA_LIBS="$("$PYTHON" - <<'PY'
+import glob, os.path, sys
+try:
+    import nvidia
+except ImportError:
+    sys.exit(0)
+dirs = set()
+for root in getattr(nvidia, "__path__", []):
+    dirs.update(p for p in glob.glob(os.path.join(root, "*", "lib")) if os.path.isdir(p))
+print(":".join(sorted(dirs)))
+PY
+)"
+
+if [[ -n "$NVIDIA_LIBS" ]]; then
+    export LD_LIBRARY_PATH="$NVIDIA_LIBS${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+fi
+
+# A user service starts outside the repository; make the package importable
+cd -- "$REPO"
+exec "$PYTHON" -m dictation.daemon "$@"

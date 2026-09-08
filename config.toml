@@ -1,0 +1,48 @@
+# Dictation daemon configuration.
+# Copy to config.local.toml to override
+
+[model]
+# Multilingual weights; [transcribe].language pins us to English.
+name = "large-v3-turbo"
+
+# "cuda" or "cpu". The daemon logs which one it actually ended up on.
+device = "cuda"
+
+# float16 on GPU; use "int8" when device = "cpu", or "int8_float16" if VRAM is tight.
+compute_type = "float16"
+
+[audio]
+# Keep these at 16000 Hz and mono since no resampling.
+# PipeWire provides this format directly based on testing
+sample_rate = 16000
+channels = 1
+blocksize = 1024
+
+# Empty string = system default input device. Otherwise a sounddevice index or a name
+# substring, e.g. "Scarlett"
+device = ""
+
+# Refuse to transcribe clips shorter than this; guards against key-bounce
+min_duration_s = 0.3
+
+[transcribe]
+language = "en"
+beam_size = 5
+# Trims leading/trailing silence. Cuts latency and suppresses hallucinated text
+# on near-silent clips
+vad_filter = true
+# Each utterance is independent; carrying context across them causes runaway
+# repetition when a clip is noise.
+condition_on_previous_text = false
+
+[daemon]
+# Unix socket the client connects to. $XDG_RUNTIME_DIR is expanded
+socket_path = "$XDG_RUNTIME_DIR/dictation.sock"
+
+[output]
+# Pipe the transcript to wl-copy
+clipboard = true
+# notify-send on start and finish
+notifications = true
+# Characters of the transcript to show in the completion notification. 0 = no preview.
+preview_chars = 80
