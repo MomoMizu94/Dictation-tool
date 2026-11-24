@@ -4,6 +4,6 @@ numpy>=2.0
 
 # CUDA 12 runtime, vendored into the venv.
 # ctranslate2's PyPI wheel dlopens libcublas.so.12, but this system ships CUDA 13
-# (libcublas.so.13), so the system libs cannot satisfy it. See README "CUDA notes"
+# (libcublas.so.13), so the system libs cannot satisfy it. See the README for CPU setup
 nvidia-cublas-cu12
 nvidia-cudnn-cu12

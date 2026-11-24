@@ -25,15 +25,25 @@ device = ""
 # Refuse to transcribe clips shorter than this; guards against key-bounce
 min_duration_s = 0.3
 
+# Stop the microphone and transcribe at this limit even if the release was missed
+max_duration_s = 120.0
+
 [transcribe]
 language = "en"
 beam_size = 5
 # Trims leading/trailing silence. Cuts latency and suppresses hallucinated text
 # on near-silent clips
 vad_filter = true
-# Each utterance is independent; carrying context across them causes runaway
-# repetition when a clip is noise.
-condition_on_previous_text = false
+# Keep sentence style across audio chunks within one recording
+# Separate recordings never share transcript text
+# Set false if long, noisy recordings produce repeated phrases
+condition_on_previous_text = true
+# Whisper imitates example text rather than following editing instructions
+# Empty string disables this punctuation and capitalization hint
+initial_prompt = "Hello. The meeting starts at nine. Please bring your notes. Are you ready? Yes, let's begin."
+# Add a final period when the transcript ends in a letter or digit, before quotes
+# Disable when dictating fragments that should remain open-ended
+ensure_final_period = true
 
 [daemon]
 # Unix socket the client connects to. $XDG_RUNTIME_DIR is expanded
@@ -42,7 +52,7 @@ socket_path = "$XDG_RUNTIME_DIR/dictation.sock"
 [output]
 # Pipe the transcript to wl-copy
 clipboard = true
-# notify-send on start and finish
+# Desktop notifications through the system Python D-Bus helper
 notifications = true
 # Characters of the transcript to show in the completion notification. 0 = no preview.
 preview_chars = 80

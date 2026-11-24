@@ -15,3 +15,6 @@ config.local.toml
 # Runtime scratch
 *.log
 *.wav
+
+# Tests folder
+/tests

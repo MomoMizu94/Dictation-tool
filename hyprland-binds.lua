@@ -12,5 +12,6 @@ end)
 hl.bind("SUPER + D", hl.dsp.exec_cmd(dictation .. " start"),
         { description = "Dictation: push to talk" })
 
+-- Keep the release active when Super or another key is released before D
 hl.bind("SUPER + D", hl.dsp.exec_cmd(dictation .. " stop"),
-        { release = true, description = "Dictation: release to transcribe" })
+        { release = true, transparent = true, description = "Dictation: release to transcribe" })
